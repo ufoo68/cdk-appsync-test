@@ -1,0 +1,17 @@
+type Item {
+    id: String!
+    data: String!
+}
+
+type Query {
+    allItem: [Item]
+}
+
+input ItemInput {
+    id: String!
+    data: String!
+}
+
+type Mutation {
+    addItem(item: ItemInput!): Item
+}
