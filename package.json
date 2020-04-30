@@ -11,7 +11,6 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.36.0",
     "@types/jest": "^25.2.1",
     "@types/node": "10.17.5",
     "aws-cdk": "1.36.0",
@@ -21,8 +20,9 @@
     "typescript": "~3.7.2"
   },
   "dependencies": {
-    "@aws-cdk/aws-appsync": "^1.36.0",
-    "@aws-cdk/core": "1.36.0",
+    "@aws-cdk/aws-appsync": "^1.36.1",
+    "@aws-cdk/aws-dynamodb": "^1.36.1",
+    "@aws-cdk/core": "^1.36.1",
     "source-map-support": "^0.5.16"
   }
 }
