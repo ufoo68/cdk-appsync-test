@@ -1,18 +1,23 @@
 import * as cdk from '@aws-cdk/core'
-import { GraphQLApi, CfnApiKey, MappingTemplate, PrimaryKey, Values } from '@aws-cdk/aws-appsync'
+import { GraphQLApi, MappingTemplate, PrimaryKey, Values, UserPoolDefaultAction } from '@aws-cdk/aws-appsync'
 import { Table, AttributeType } from '@aws-cdk/aws-dynamodb'
+import { UserPool } from '@aws-cdk/aws-cognito'
 
 export class CdkAppsyncTestStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
 
+    const userPool = new UserPool(this, 'UserPool')
+
     const api = new GraphQLApi(this, 'graphQlApi', {
       name: 'test-api',
+      authorizationConfig: {
+        defaultAuthorization: {
+          userPool,
+          defaultAction: UserPoolDefaultAction.ALLOW,
+        },
+      },
       schemaDefinitionFile: './schema.graphql',
-    })
-
-    new CfnApiKey(this, 'apiKey', {
-      apiId: api.apiId,
     })
 
     const itemTable = new Table(this, 'itemTable', {
@@ -33,8 +38,8 @@ export class CdkAppsyncTestStack extends cdk.Stack {
       typeName: 'Mutation',
       fieldName: 'addItem',
       requestMappingTemplate: MappingTemplate.dynamoDbPutItem(
-          PrimaryKey.partition('id').auto(),
-          Values.projecting('item')),
+        PrimaryKey.partition('id').auto(),
+        Values.projecting('item')),
       responseMappingTemplate: MappingTemplate.dynamoDbResultItem(),
     })
   }
