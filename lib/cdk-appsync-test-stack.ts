@@ -49,15 +49,15 @@ export class CdkAppsyncTestStack extends cdk.Stack {
       responseMappingTemplate: MappingTemplate.dynamoDbResultItem(),
     })
 
-const allItemOnCategory = new Function(this, 'allItemOnCategory', {
-  code: Code.asset('lambda/allItemOnCategory'),
-  handler: 'index.handler',
-  runtime: Runtime.NODEJS_12_X,
-  environment: {
-    TABLE_NAME: itemTable.tableName,
-  },
-})
-itemTable.grantReadData(allItemOnCategory)
+    const allItemOnCategory = new Function(this, 'allItemOnCategory', {
+      code: Code.asset('lambda/allItemOnCategory'),
+      handler: 'index.handler',
+      runtime: Runtime.NODEJS_12_X,
+      environment: {
+        TABLE_NAME: itemTable.tableName,
+      },
+    })
+    itemTable.grantReadData(allItemOnCategory)
 
     api.addLambdaDataSource('ItemLambda', 'Item lambda source', allItemOnCategory).createResolver({
       typeName: 'Query',
