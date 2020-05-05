@@ -1,14 +1,22 @@
+enum Category {
+    HOGEHOGE
+    HUGAHUGA
+}
+
 type Item {
     id: String!
     data: String!
+    category: Category!
 }
 
 type Query {
     allItem: [Item]
+    allItemOnCategory(category: Category): [Item]
 }
 
 input ItemInput {
     data: String!
+    category: Category!
 }
 
 type Mutation {

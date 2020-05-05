@@ -146,7 +146,7 @@
     "@aws-cdk/core" "1.36.1"
     constructs "^3.0.2"
 
-"@aws-cdk/aws-lambda@1.36.1":
+"@aws-cdk/aws-lambda@1.36.1", "@aws-cdk/aws-lambda@^1.36.1":
   version "1.36.1"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-lambda/-/aws-lambda-1.36.1.tgz#9e0ec2c533f22370ab3e554a7577a7a9f5ba0e96"
   integrity sha512-Ai9RHwfJTio5HZnThxypm8I4da76rAuYdTnmPm+wISASAtO5TfgAje5XofPCnR1VqFW6nd+EtCROwJjwhqh98g==

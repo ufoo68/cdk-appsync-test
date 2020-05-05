@@ -1,6 +1,7 @@
 import * as cdk from '@aws-cdk/core'
 import { GraphQLApi, CfnApiKey, MappingTemplate, PrimaryKey, Values } from '@aws-cdk/aws-appsync'
 import { Table, AttributeType } from '@aws-cdk/aws-dynamodb'
+import { Function, Code, Runtime } from '@aws-cdk/aws-lambda'
 
 export class CdkAppsyncTestStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -19,10 +20,20 @@ export class CdkAppsyncTestStack extends cdk.Stack {
       partitionKey: {
         name: 'id',
         type: AttributeType.STRING,
+      },
+      sortKey: {
+        name: 'category',
+        type: AttributeType.STRING,
       }
     })
-
-    const itemDS = api.addDynamoDbDataSource('Item', 'Item data source', itemTable)
+    itemTable.addGlobalSecondaryIndex({
+      indexName: 'categoryKey',
+      partitionKey: {
+        name: 'category',
+        type: AttributeType.STRING,
+      }
+    })
+    const itemDS = api.addDynamoDbDataSource('ItemDynamoDB', 'Item data source', itemTable)
     itemDS.createResolver({
       typeName: 'Query',
       fieldName: 'allItem',
@@ -33,9 +44,27 @@ export class CdkAppsyncTestStack extends cdk.Stack {
       typeName: 'Mutation',
       fieldName: 'addItem',
       requestMappingTemplate: MappingTemplate.dynamoDbPutItem(
-          PrimaryKey.partition('id').auto(),
-          Values.projecting('item')),
+        PrimaryKey.partition('id').auto(),
+        Values.projecting('item')),
       responseMappingTemplate: MappingTemplate.dynamoDbResultItem(),
     })
+
+const allItemOnCategory = new Function(this, 'allItemOnCategory', {
+  code: Code.asset('lambda/allItemOnCategory'),
+  handler: 'index.handler',
+  runtime: Runtime.NODEJS_12_X,
+  environment: {
+    TABLE_NAME: itemTable.tableName,
+  },
+})
+itemTable.grantReadData(allItemOnCategory)
+
+    api.addLambdaDataSource('ItemLambda', 'Item lambda source', allItemOnCategory).createResolver({
+      typeName: 'Query',
+      fieldName: 'allItemOnCategory',
+      requestMappingTemplate: MappingTemplate.lambdaRequest(),
+      responseMappingTemplate: MappingTemplate.lambdaResult(),
+    })
+
   }
 }
