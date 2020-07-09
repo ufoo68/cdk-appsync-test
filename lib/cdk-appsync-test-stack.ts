@@ -1,11 +1,16 @@
 import * as cdk from '@aws-cdk/core'
 import { GraphQLApi, CfnApiKey, MappingTemplate, PrimaryKey, Values } from '@aws-cdk/aws-appsync'
 import { Table, AttributeType } from '@aws-cdk/aws-dynamodb'
-import { Function, Code, Runtime } from '@aws-cdk/aws-lambda'
+import { Function, Code, Runtime, LayerVersion } from '@aws-cdk/aws-lambda'
 
 export class CdkAppsyncTestStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props)
+
+    const layer = new LayerVersion(this, 'layer', {
+      compatibleRuntimes: [Runtime.NODEJS_12_X],
+      code: Code.fromAsset('layer'),
+    })
 
     const api = new GraphQLApi(this, 'graphQlApi', {
       name: 'test-api',
@@ -53,6 +58,7 @@ export class CdkAppsyncTestStack extends cdk.Stack {
       code: Code.asset('lambda/allItemOnCategory'),
       handler: 'index.handler',
       runtime: Runtime.NODEJS_12_X,
+      layers: [layer],
       environment: {
         TABLE_NAME: itemTable.tableName,
       },
